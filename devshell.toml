@@ -55,6 +55,13 @@ package = "golangci-lint"
 package = "gouml"
 
 [[commands]]
+package = "go-mockery"
+command = "mockery"
+
+[[commands]]
+package = "schemathesis"
+
+[[commands]]
 package = "nomad"
 
 [[commands]]
