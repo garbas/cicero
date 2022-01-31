@@ -4,7 +4,7 @@ imports = [
 
 [[env]]
 name = "DATABASE_URL"
-value = "postgres://cicero:@127.0.0.1:5432/cicero?sslmode=disable"
+value = "postgres://postgres:@127.0.0.1:5432/cicero?sslmode=disable"
 
 [[env]]
 name = "LOKI_ADDR"
@@ -80,7 +80,7 @@ packages = [
   # deployment
   "cue",
   "nomad-follower",
-  "postgresql_12",
+  "postgresql",
   "vector",
   "grafana-loki",
 

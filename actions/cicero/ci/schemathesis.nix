@@ -20,40 +20,37 @@
         ${name}.group.schemathesis = {
           network = {
             mode = "bridge";
-            port = {
-              http.to = 8080;
-              db.to = 5432;
-            };
+            port.cicero = {};
           };
 
           task = {
-            dev = {
+            cicero = {
               lifecycle = {
                 hook = "prestart";
                 sidecar = true;
               };
 
-              config.nixos = "github:input-output-hk/cicero/${cfg.sha}#nixosConfigurations.dev";
-            };
+              config.nixos = "github:input-output-hk/cicero/${cfg.sha}#nixosConfigurations.cicero";
 
-            cicero = {
-              lifecycle.sidecar = true;
+              template = [{
+                destination = "/etc/cicero/start.args";
+                data = ''
+                  --web-listen :{{ env "NOMAD_PORT_cicero" }}
 
-              config = {
-                packages = [ "github:input-output-hk/cicero/${cfg.sha}#cicero-entrypoint" ];
-                command = [ "/bin/entrypoint" "--web-listen" ":\${NOMAD_PORT_http}" ];
-              };
-
-              env.DATABASE_URL = "postgres://cicero:@127.0.0.1:\${NOMAD_PORT_db}/cicero?sslmode=disable";
+                  ${""/*
+                    Do not try to connect to Nomad
+                    as we have none running.
+                  */}
+                  web
+                '';
+              }];
             };
 
             schemathesis = std.chain args [
-              { lifecycle.hook = "poststart"; }
+              (std.networking.addNameservers [ "1.1.1.1" ])
 
               (lib.optionalAttrs (cfg ? statuses_url)
                 (std.github.reportStatus cfg.statuses_url))
-
-              (std.networking.addNameservers [ "1.1.1.1" ])
 
               (std.git.clone cfg)
 
@@ -64,7 +61,7 @@
               }
 
               (std.script "bash" ''
-                exec schemathesis run http://127.0.0.1:$NOMAD_PORT_http/documentation/cicero.yaml --validate-schema=false
+                exec schemathesis run http://127.0.0.1:$NOMAD_PORT_cicero/documentation/cicero.yaml --validate-schema=false
               '')
             ];
           };

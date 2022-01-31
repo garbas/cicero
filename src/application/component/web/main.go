@@ -36,7 +36,7 @@ type Web struct {
 }
 
 func (self *Web) Start(ctx context.Context) error {
-	self.Logger.Info().Msg("Starting")
+	self.Logger.Info().Str("listen", self.Listen).Msg("Starting")
 
 	muxRouter := mux.NewRouter().StrictSlash(true).UseEncodedPath()
 	r, err := apidoc.NewRouterDocumented(apirouter.NewGorillaMuxRouter(muxRouter), "Cicero REST API", "1.0.0", "cicero", ctx)
