@@ -336,6 +336,8 @@ rec {
               function report {
                 echo 'Reporting GitHub commit status: '"$1"
 
+                set -x
+
                 jq -nc '{
                   state: $state,
                   context: $action_name,
